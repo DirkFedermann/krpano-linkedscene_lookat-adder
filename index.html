@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1><code>linkedscene_lookat</code> Adder</h1>
+    <p>In the krpano version 1.21.2 (build 2023-12-11) there is a bug, that with existing vtours with hotspots that DO NOT have the <code>linkedscene_lookat</code> attribute the feature of adding a "Target Startup View" to existing hotspots is not working.<br>
+    This is because krpano wants to EDIT <code>linkedscene_lookat</code> but it isn't there. But it also does not add it.</p>
+    <p>This Adder adds a <code>linkedscene_lookat</code> to all hotspots. This will allow you to edit and add a Target Startup View to your existing hotspots.</p>
+    <h3>CAUTION: It adds it to ALL hotspots with a FOV of 120.0 and a hlookat 0.0 and vlookat 0.0</h3>
+    <h3>DISCLAIMER: This tool is working with 100% pure Javascript, nothing gets saved or transmitted. Always make a backup of your `tour.xml` before using the output of this tool!</h4>
+    <br>
+    <textarea id="originxml" cols="100" rows="10" placeholder="Enter current XML here..."></textarea>
+    <button onclick="convert()">Convert</button>
+    <textarea id="result" cols="100" rows="10"></textarea>
+
+    <script>
+      function convert() {
+        let tourxml = document.getElementById("originxml").value;
+
+        if (tourxml === "") {
+          alert("Please enter XML");
+          return;
+        }
+
+        let oldHotspotPosition = 0;
+
+        while (tourxml.indexOf("<hotspot", oldHotspotPosition) !== -1) {
+          let hotspotPosition = tourxml.indexOf("<hotspot", oldHotspotPosition);
+          let hotspotEndPosition = tourxml.indexOf("\" />", hotspotPosition);
+          let hotspotLength = hotspotEndPosition - hotspotPosition + 4;
+          let oldHotspot = tourxml.substring(hotspotPosition, hotspotPosition + hotspotLength);
+          let hotspot = oldHotspot.replace("/>", "linkedscene_lookat=\"0.0,0.0,120.0\" />");
+
+          tourxml = tourxml.replace(oldHotspot, hotspot);
+
+          oldHotspotPosition = hotspotEndPosition;
+        }
+
+        document.getElementById("result").value = tourxml;
+      }
+    </script>
+</body>
+</html>
